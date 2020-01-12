@@ -1,5 +1,5 @@
 {
-  "name": "pibarbican-backend",
+  "name": "pibarbican",
   "version": "0.1.0",
   "description": "Raspberry Pi CV and Audio Watchtower with SPA App Alerting",
   "main": "index.js",
