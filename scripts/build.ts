@@ -36,22 +36,30 @@ function compile(fileNames: string[], options: ts.CompilerOptions): boolean {
 }
 
 /**
+ * removes build directory
+ */
+function removeBuild(): void {
+  if (fs.existsSync(relOutDir)) {
+    console.log(chalk.yellow("Removing build directory...\n"));
+    fs.rmdirSync(relOutDir, {recursive: true});
+  }
+}
+
+/**
  * exits process with error code and deletes build directory if error code > 0
  * @param code error code
  */
 function exit(code: number): void {
   if (code > 0) {
-    if (fs.existsSync(relOutDir)) {
-      console.log(chalk.red("Removing build directory..."));
-      fs.rmdirSync(relOutDir, {recursive: true});
-    }
+    removeBuild();
   }
   console.log("Process exiting with code " + code);
   process.exit(code);
 }
 
+removeBuild();
 if (compile([index], tsConfig.compilerOptions)) {
-  console.log(chalk.green("Backend build, building frontend..."));
+  console.log(chalk.green("Backend build, building frontend...\n"));
 
   const frontendBuild = spawn("npm", ["run", "build", "--prefix", "frontend"]);
   frontendBuild.stdout.on("data", (data) => {
@@ -62,7 +70,7 @@ if (compile([index], tsConfig.compilerOptions)) {
   });
   frontendBuild.on("close", (code) => {
     if (code > 0) {
-      console.log(chalk.red("Frontend build failed"));
+      console.log(chalk.red("Frontend build failed\n"));
     } else {
       if (!fs.existsSync(httpServerPublicDir)) {
         fs.mkdirSync(httpServerPublicDir);
@@ -75,7 +83,7 @@ if (compile([index], tsConfig.compilerOptions)) {
   });
 
 } else {
-  console.log(chalk.red("Backend not build, skipping frontend"));
+  console.log(chalk.red("Backend not build, skipping frontend\n"));
 
   // exit with error code 1
   exit(1);
